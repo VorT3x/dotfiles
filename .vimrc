@@ -26,9 +26,9 @@ Plugin 'majutsushi/tagbar'
 Plugin 'rizzatti/dash.vim'
 Plugin 'Raimondi/delimitMate'
 Plugin 'tomtom/tcomment_vim'
-Plugin 'scrooloose/syntastic'
 Plugin 'elzr/vim-json'
 Plugin 'cespare/vim-toml'
+Plugin 'scrooloose/nerdtree'
 
 " Markdown
 Plugin 'godlygeek/tabular'
@@ -50,7 +50,6 @@ Plugin 'honza/vim-snippets'
 " Shougo
 Plugin 'Shougo/unite.vim'
 Plugin 'Shougo/vimproc.vim', { 'do': 'make' }
-Plugin 'Shougo/vimfiler.vim'
 
 call vundle#end()
 
@@ -141,18 +140,20 @@ let g:go_highlight_interfaces = 1
 let g:go_highlight_operators = 1
 let g:go_highlight_build_constraints = 1
 
+au FileType go nmap <Leader>ca <Plug>(go-callers)
+au FileType go nmap <Leader>c <Plug>(go-callees)
+au FileType go nmap <leader>co <Plug>(go-coverage)
+
+au FileType go nmap <leader>r :GoRun<CR>
 au FileType go nmap <Leader>s <Plug>(go-def-split)
 au FileType go nmap <Leader>v <Plug>(go-def-vertical)
 au FileType go nmap <Leader>in <Plug>(go-info)
 au FileType go nmap <Leader>ii <Plug>(go-implements)
-au FileType go nmap <leader>c <Plug>(go-coverage)
-
-au FileType go nmap <leader>r :GoRun<CR>
 au FileType go nmap <leader>b <Plug>(go-build)
 au FileType go nmap <leader>t <Plug>(go-test)
 au FileType go nmap <Leader>d <Plug>(go-doc)
-au FileType go nmap <Leader>f :GoImports<CR>
-au FileType go nmap <Leader>e <Plug>(go-rename)
+au FileType go nmap <Leader>rr <Plug>(go-rename)
+au FileType go nmap noremap :w<CR> :w<CR>:GoMetaLinter<CR>
 
 " vim-airline
 let g:airline_powerline_fonts = 1
@@ -213,18 +214,6 @@ let delimitMate_smart_quotes = 1
 let delimitMate_expand_inside_quotes = 0
 let delimitMate_smart_matchpairs = '^\%(\w\|\$\)'
 
-" Syntastic
-let g:syntastic_go_checkers = ['golint', 'govet', 'errcheck']
-let g:syntastic_mode_map = { 'mode': 'active', 'passive_filetypes': ['go'] }
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-noremap :w<CR> :w<CR>:SyntasticCheck<CR>
-
-" Gotags
-noremap <Leader>gt :!gotags -R . > tags<CR><CR>
-
 " vim-markdown-preview
 let vim_markdown_preview_toggle=2
 let vim_markdown_preview_github=1
@@ -252,4 +241,6 @@ let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
 " unite.vim
 nnoremap <C-p> :Unite buffer file_rec/neovim<cr>
 nnoremap <leader>/ :Unite grep:.<cr>
-nnoremap <leader>n :VimFilerExplorer<cr>
+
+" Nerd TREE
+map <C-n> :NERDTreeToggle<CR>
