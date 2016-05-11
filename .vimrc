@@ -153,7 +153,7 @@ au FileType go nmap <leader>b <Plug>(go-build)
 au FileType go nmap <leader>t <Plug>(go-test)
 au FileType go nmap <Leader>d <Plug>(go-doc)
 au FileType go nmap <Leader>rr <Plug>(go-rename)
-au FileType go nmap noremap :w<CR> :w<CR>:GoMetaLinter<CR>
+au FileType go nmap :w<CR> :w<CR>:GoMetaLinter<CR>
 
 " vim-airline
 let g:airline_powerline_fonts = 1
