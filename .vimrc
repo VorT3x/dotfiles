@@ -8,7 +8,6 @@ Plugin 'VundleVim/Vundle.vim'
 
 " Go
 Plugin 'fatih/vim-go', {'for': 'go'}
-Plugin 'dgryski/vim-godef'
 
 " JavaScript
 Plugin 'pangloss/vim-javascript'
@@ -21,14 +20,12 @@ Plugin 'airblade/vim-gitgutter'
 
 " Other
 Plugin 'bling/vim-airline'
-Plugin 'joshdick/airline-onedark.vim'
 Plugin 'majutsushi/tagbar'
 Plugin 'rizzatti/dash.vim'
 Plugin 'Raimondi/delimitMate'
-Plugin 'tomtom/tcomment_vim'
-Plugin 'elzr/vim-json'
-Plugin 'cespare/vim-toml'
+Plugin 'tpope/vim-commentary'
 Plugin 'scrooloose/nerdtree'
+Plugin 'SirVer/ultisnips'
 
 " Markdown
 Plugin 'godlygeek/tabular'
@@ -37,26 +34,29 @@ Plugin 'JamshedVesuna/vim-markdown-preview'
 
 " Color scheme
 Plugin 'joshdick/onedark.vim'
+Plugin 'endel/vim-github-colorscheme'
+Plugin 'joshdick/airline-onedark.vim'
 
 " Autocomplete
-Plugin 'ervandew/supertab'
 Plugin 'Shougo/deoplete.nvim'
 Plugin 'zchee/deoplete-go', { 'do': 'make'}
-
-" Snippets
-Plugin 'SirVer/ultisnips'
-Plugin 'honza/vim-snippets'
+Plugin 'ervandew/supertab'
 
 " Shougo
 Plugin 'Shougo/unite.vim'
 Plugin 'Shougo/vimproc.vim', { 'do': 'make' }
+
+" File type
+Plugin 'elzr/vim-json', {'for' : 'json'}
+Plugin 'cespare/vim-toml', {'for' : 'toml'}
+Plugin 'ekalinin/Dockerfile.vim', {'for' : 'Dockerfile'}
 
 call vundle#end()
 
 " Vim settings
 let mapleader=" "               " Change leader to space
 colorscheme onedark             " Turn on onedark theme 
-let g:rehash256 = 1             " Bring the 256 color version as close as possible to the the default (dark) GUI version
+let g:rehash256=1             " Bring the 256 color version as close as possible to the the default (dark) GUI version
 filetype plugin indent on       " Automatically detect file types
 syntax on                       " Enable syntax highlighting
 set scrolloff=999               " Enable cursor to stay in the middle line when possible
@@ -75,7 +75,7 @@ set completeopt-=preview        " Don't pop up preview window
 set backspace=indent,eol,start  " Makes backspace key more powerful
 set ruler                       " Show position
 set showcmd                     " Show command
-set showmode                    " Show current mode
+set noshowmode                  " Do not show current mode, airline handles it
 set title                       " Enable title
 set clipboard=unnamed           " Enable shared clipboard
 set autoread                    " Automatic file reload
@@ -83,6 +83,21 @@ set wildmode=longest,list,full  " Bash-like tab completion
 set history=1000                " Store a ton of history (default is 20)
 set mouse=a                     " Enable mouse
 set colorcolumn=80              " Enable ColorColumn
+set lazyredraw                  " Wait to redraw
+set ttyfast                     " Performance boost
+set pumheight=10		" Completion window max size
+
+" Remember last position
+if has("autocmd")
+  au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+endif
+
+" Center the screen
+nnoremap <enter> zz
+
+" Fast saving
+nnoremap <leader>w :w!<cr>
+nnoremap <silent> <leader>q :q!<CR>
 
 " ColorColumn custom color
 highlight ColorColumn ctermbg=234
@@ -96,6 +111,12 @@ set shiftwidth=2
 set softtabstop=2
 set smartindent
 
+" Flexible window splits
+set winwidth=85
+
+" Scroll past end / beginning
+set scrolloff=5
+
 " Status line
 set laststatus=2
 set statusline=%t%m%r\ %{fugitive#statusline()}%=[%{&ff}%Y]\ [%04l,%04v,%p%%]
@@ -105,6 +126,12 @@ nnoremap <C-J> <C-W><C-J>
 nnoremap <C-K> <C-W><C-K>
 nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
+
+" Source (reload configuration)
+nnoremap <silent> <F5> :source $MYVIMRC<CR>
+
+" Print full path
+map <C-f> :echo expand("%:p")<cr>
 
 " Terminals
 if has('nvim')
@@ -121,6 +148,9 @@ noremap <Right> <NOP>
 " set it to the first line when editing a git commit message
 au FileType gitcommit au! BufEnter COMMIT_EDITMSG call setpos('.', [0, 1, 1, 0])
 
+" Adjust tabs for .go files
+autocmd BufNewFile,BufRead *.go setlocal noet ts=4 sw=4 sts=4
+
 " vim-go
 let g:go_term_enabled = 1
 let g:go_disable_autoinstall = 0
@@ -132,12 +162,10 @@ let g:go_highlight_array_whitespace_error = 1
 let g:go_highlight_trailing_whitespace_error = 1
 let g:go_highlight_extra_types = 1
 let g:go_highlight_operators = 1
-
 let g:go_highlight_functions = 1
 let g:go_highlight_methods = 1
 let g:go_highlight_structs = 1
 let g:go_highlight_interfaces = 1
-let g:go_highlight_operators = 1
 let g:go_highlight_build_constraints = 1
 
 au FileType go nmap <Leader>ca <Plug>(go-callers)
@@ -153,7 +181,7 @@ au FileType go nmap <leader>b <Plug>(go-build)
 au FileType go nmap <leader>t <Plug>(go-test)
 au FileType go nmap <Leader>d <Plug>(go-doc)
 au FileType go nmap <Leader>rr <Plug>(go-rename)
-au FileType go nmap :w<CR> :w<CR>:GoMetaLinter<CR>
+au FileType go nmap <Leader>l <Plug>(go-metalinter)
 
 " vim-airline
 let g:airline_powerline_fonts = 1
@@ -227,20 +255,64 @@ let g:vim_markdown_frontmatter = 1
 let g:vim_markdown_toml_frontmatter = 1
 let g:vim_markdown_json_frontmatter = 1
 
+" supertab
+let g:SuperTabDefaultCompletionType = "<c-n>"
+
 " deoplete.nvim
 let g:deoplete#enable_at_startup = 1
+let g:deoplete#ignore_sources = {}
+let g:deoplete#ignore_sources._ = ['buffer', 'member', 'tag', 'file', 'neosnippet']
 let g:deoplete#sources#go#gocode_binary = $GOPATH.'/bin/gocode'
 let g:deoplete#sources#go#sort_class = ['package', 'func', 'type', 'var', 'const']
+let g:deoplete#sources#go#align_class = 1
 
-" ultisnips 
-inoremap <silent><expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsJumpForwardTrigger="<tab>"
-let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+" Use partial fuzzy matches like YouCompleteMe
+call deoplete#custom#set('_', 'matchers', ['matcher_fuzzy'])
+call deoplete#custom#set('_', 'converters', ['converter_remove_paren'])
+call deoplete#custom#set('_', 'disabled_syntaxes', ['Comment', 'String'])
 
 " unite.vim
-nnoremap <C-p> :Unite buffer file_rec/neovim<cr>
+nnoremap <C-p> :Unite buffer file_rec/neovim -start-insert<cr>
 nnoremap <leader>/ :Unite grep:.<cr>
 
 " Nerd TREE
-map <C-n> :NERDTreeToggle<CR>
+noremap <Leader>n :NERDTreeToggle<cr>
+noremap <Leader>f :NERDTreeFind<cr>
+let NERDTreeShowHidden=1
+
+" ultisnips
+function! g:UltiSnips_Complete()
+  call UltiSnips#ExpandSnippet()
+  if g:ulti_expand_res == 0
+    if pumvisible()
+      return "\<C-n>"
+    else
+      call UltiSnips#JumpForwards()
+      if g:ulti_jump_forwards_res == 0
+        return "\<TAB>"
+      endif
+    endif
+  endif
+  return ""
+endfunction
+
+function! g:UltiSnips_Reverse()
+  call UltiSnips#JumpBackwards()
+  if g:ulti_jump_backwards_res == 0
+    return "\<C-P>"
+  endif
+
+  return ""
+endfunction
+
+
+if !exists("g:UltiSnipsJumpForwardTrigger")
+  let g:UltiSnipsJumpForwardTrigger = "<tab>"
+endif
+
+if !exists("g:UltiSnipsJumpBackwardTrigger")
+  let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+endif
+
+au InsertEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
+au InsertEnter * exec "inoremap <silent> " . g:UltiSnipsJumpBackwardTrigger . " <C-R>=g:UltiSnips_Reverse()<cr>"
