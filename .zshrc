@@ -7,7 +7,7 @@ plugins=(git last-working-dir heroku postgres bower nvm node npm zsh-syntax-high
 
 # User configuration
 export PATH="/Users/dlogvinenko/.rbenv/shims:/Users/dlogvinenko/.rbenv/shims:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-
+export EDITOR=vim
 source $ZSH/oh-my-zsh.sh
 
 alias ls='gls -X -h --group-directories-first --color'
@@ -17,6 +17,7 @@ alias grep='grep --color=auto'
 export PATH="/usr/local/heroku/bin:$PATH"
 
 # GO
+export GOROOT="/usr/local/Cellar/go/1.7.1/libexec"
 export GOPATH="/Users/dlogvinenko/Documents/SoftwareDevelopment/golang"
 export PATH="/$GOPATH/bin:$PATH"
 

@@ -26,6 +26,8 @@ Plugin 'Raimondi/delimitMate'
 Plugin 'tpope/vim-commentary'
 Plugin 'scrooloose/nerdtree'
 Plugin 'SirVer/ultisnips'
+Plugin 'honza/vim-snippets'
+Plugin 'tpope/vim-surround'
 
 " Markdown
 Plugin 'godlygeek/tabular'
@@ -35,7 +37,6 @@ Plugin 'JamshedVesuna/vim-markdown-preview'
 " Color scheme
 Plugin 'joshdick/onedark.vim'
 Plugin 'endel/vim-github-colorscheme'
-Plugin 'joshdick/airline-onedark.vim'
 
 " Autocomplete
 Plugin 'Shougo/deoplete.nvim'
@@ -54,9 +55,11 @@ Plugin 'ekalinin/Dockerfile.vim', {'for' : 'Dockerfile'}
 call vundle#end()
 
 " Vim settings
+set langmenu=en_US
+let $LANG = 'en_US'
 let mapleader=" "               " Change leader to space
 colorscheme onedark             " Turn on onedark theme 
-let g:rehash256=1             " Bring the 256 color version as close as possible to the the default (dark) GUI version
+let g:rehash256=1               " Bring the 256 color version as close as possible to the the default (dark) GUI version
 filetype plugin indent on       " Automatically detect file types
 syntax on                       " Enable syntax highlighting
 set scrolloff=999               " Enable cursor to stay in the middle line when possible
@@ -85,15 +88,13 @@ set mouse=a                     " Enable mouse
 set colorcolumn=80              " Enable ColorColumn
 set lazyredraw                  " Wait to redraw
 set ttyfast                     " Performance boost
-set pumheight=10		" Completion window max size
+set pumheight=10                " Completion window max size
 
 " Remember last position
 if has("autocmd")
   au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 endif
 
-" Center the screen
-nnoremap <enter> zz
 
 " Fast saving
 nnoremap <leader>w :w!<cr>
@@ -153,32 +154,28 @@ autocmd BufNewFile,BufRead *.go setlocal noet ts=4 sw=4 sts=4
 
 " vim-go
 let g:go_term_enabled = 1
-let g:go_disable_autoinstall = 0
 let g:go_fmt_command = "goimports"
-let g:go_autodetect_gopath = 1
+let g:go_auto_type_info = 1
 
-let g:go_highlight_space_tab_error = 1
-let g:go_highlight_array_whitespace_error = 1
-let g:go_highlight_trailing_whitespace_error = 1
-let g:go_highlight_extra_types = 1
 let g:go_highlight_operators = 1
 let g:go_highlight_functions = 1
 let g:go_highlight_methods = 1
 let g:go_highlight_structs = 1
 let g:go_highlight_interfaces = 1
+let g:go_highlight_fields = 1
 let g:go_highlight_build_constraints = 1
 
 au FileType go nmap <Leader>ca <Plug>(go-callers)
 au FileType go nmap <Leader>c <Plug>(go-callees)
-au FileType go nmap <leader>co <Plug>(go-coverage)
+au FileType go nmap <Leader>co <Plug>(go-coverage)
 
-au FileType go nmap <leader>r :GoRun<CR>
+au FileType go nmap <Leader>r :GoRun<CR>
 au FileType go nmap <Leader>s <Plug>(go-def-split)
 au FileType go nmap <Leader>v <Plug>(go-def-vertical)
 au FileType go nmap <Leader>in <Plug>(go-info)
 au FileType go nmap <Leader>ii <Plug>(go-implements)
-au FileType go nmap <leader>b <Plug>(go-build)
-au FileType go nmap <leader>t <Plug>(go-test)
+au FileType go nmap <Leader>b <Plug>(go-build)
+au FileType go nmap <Leader>t <Plug>(go-test)
 au FileType go nmap <Leader>d <Plug>(go-doc)
 au FileType go nmap <Leader>rr <Plug>(go-rename)
 au FileType go nmap <Leader>l <Plug>(go-metalinter)
@@ -227,7 +224,7 @@ nnoremap <silent> <leader>gd :Gdiff<CR>
 nnoremap <silent> <leader>gc :Gcommit<CR>
 nnoremap <silent> <leader>gb :Gblame<CR>
 nnoremap <silent> <leader>gl :Glog<CR>
-nnoremap <silent> <leader>gp :Git push<CR>
+nnoremap <silent> <leader>gp :Gpush<CR>
 nnoremap <silent> <leader>gr :Gread<CR>
 nnoremap <silent> <leader>gw :Gwrite<CR>
 nnoremap <silent> <leader>ge :Gedit<CR>
