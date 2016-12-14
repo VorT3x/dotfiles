@@ -32,7 +32,7 @@ Plugin 'tpope/vim-surround'
 " Markdown
 Plugin 'godlygeek/tabular'
 Plugin 'plasticboy/vim-markdown'
-Plugin 'JamshedVesuna/vim-markdown-preview'
+Plugin 'suan/vim-instant-markdown'
 
 " Color scheme
 Plugin 'joshdick/onedark.vim'
@@ -94,7 +94,6 @@ set pumheight=10                " Completion window max size
 if has("autocmd")
   au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 endif
-
 
 " Fast saving
 nnoremap <leader>w :w!<cr>
@@ -238,12 +237,6 @@ let g:delimitMate_expand_space = 1
 let delimitMate_smart_quotes = 1
 let delimitMate_expand_inside_quotes = 0
 let delimitMate_smart_matchpairs = '^\%(\w\|\$\)'
-
-" vim-markdown-preview
-let vim_markdown_preview_toggle=2
-let vim_markdown_preview_github=1
-let vim_markdown_preview_hotkey='<C-l>'
-let vim_markdown_preview_browser='Safari'
 
 " vim-markdown
 let g:vim_markdown_conceal = 0
