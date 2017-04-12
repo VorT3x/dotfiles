@@ -8,6 +8,7 @@ Plugin 'VundleVim/Vundle.vim'
 
 " Go
 Plugin 'fatih/vim-go', {'for': 'go'}
+Plugin 'jodosha/vim-godebug'
 
 " JavaScript
 Plugin 'pangloss/vim-javascript'
@@ -28,11 +29,14 @@ Plugin 'scrooloose/nerdtree'
 Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
 Plugin 'tpope/vim-surround'
+Plugin 'janko-m/vim-test'
 
 " Markdown
 Plugin 'godlygeek/tabular'
 Plugin 'plasticboy/vim-markdown'
 Plugin 'suan/vim-instant-markdown'
+Plugin 'mzlogin/vim-markdown-toc'
+Plugin 'dhruvasagar/vim-table-mode'
 
 " Color scheme
 Plugin 'joshdick/onedark.vim'
@@ -51,12 +55,11 @@ Plugin 'Shougo/vimproc.vim', { 'do': 'make' }
 Plugin 'elzr/vim-json', {'for' : 'json'}
 Plugin 'cespare/vim-toml', {'for' : 'toml'}
 Plugin 'ekalinin/Dockerfile.vim', {'for' : 'Dockerfile'}
+Plugin 'martinda/Jenkinsfile-vim-syntax', {'for' : 'Jenkinsfile'}
 
 call vundle#end()
 
 " Vim settings
-set langmenu=en_US
-let $LANG = 'en_US'
 let mapleader=" "               " Change leader to space
 colorscheme onedark             " Turn on onedark theme 
 let g:rehash256=1               " Bring the 256 color version as close as possible to the the default (dark) GUI version
@@ -89,6 +92,8 @@ set colorcolumn=80              " Enable ColorColumn
 set lazyredraw                  " Wait to redraw
 set ttyfast                     " Performance boost
 set pumheight=10                " Completion window max size
+set autowrite                   " Automatically write content on :make command
+set updatetime=100              " Update status line more often
 
 " Remember last position
 if has("autocmd")
@@ -163,21 +168,18 @@ let g:go_highlight_structs = 1
 let g:go_highlight_interfaces = 1
 let g:go_highlight_fields = 1
 let g:go_highlight_build_constraints = 1
+let g:go_highlight_extra_types = 1
 
-au FileType go nmap <Leader>ca <Plug>(go-callers)
-au FileType go nmap <Leader>c <Plug>(go-callees)
-au FileType go nmap <Leader>co <Plug>(go-coverage)
+autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
+autocmd Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
+autocmd Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
+autocmd Filetype go command! -bang AT call go#alternate#Switch(<bang>0, 'tabe')
 
 au FileType go nmap <Leader>r :GoRun<CR>
 au FileType go nmap <Leader>s <Plug>(go-def-split)
 au FileType go nmap <Leader>v <Plug>(go-def-vertical)
-au FileType go nmap <Leader>in <Plug>(go-info)
-au FileType go nmap <Leader>ii <Plug>(go-implements)
 au FileType go nmap <Leader>b <Plug>(go-build)
-au FileType go nmap <Leader>t <Plug>(go-test)
-au FileType go nmap <Leader>d <Plug>(go-doc)
 au FileType go nmap <Leader>rr <Plug>(go-rename)
-au FileType go nmap <Leader>l <Plug>(go-metalinter)
 
 " vim-airline
 let g:airline_powerline_fonts = 1
@@ -265,6 +267,12 @@ call deoplete#custom#set('_', 'disabled_syntaxes', ['Comment', 'String'])
 nnoremap <C-p> :Unite buffer file_rec/neovim -start-insert<cr>
 nnoremap <leader>/ :Unite grep:.<cr>
 
+let g:unite_source_grep_command = 'ag'
+let g:unite_source_grep_default_opts =
+      \ '-i --line-numbers --nocolor --nogroup --hidden --ignore ' .
+      \  '''.hg'' --ignore ''.svn'' --ignore ''.git'' --ignore ''.bzr'' --ignore ''vendor'''
+let g:unite_source_grep_recursive_opt = ''
+
 " Nerd TREE
 noremap <Leader>n :NERDTreeToggle<cr>
 noremap <Leader>f :NERDTreeFind<cr>
@@ -306,3 +314,10 @@ endif
 
 au InsertEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
 au InsertEnter * exec "inoremap <silent> " . g:UltiSnipsJumpBackwardTrigger . " <C-R>=g:UltiSnips_Reverse()<cr>"
+
+let g:table_mode_corner="|"
+
+let g:python_host_prog = '/usr/local/bin/python'
+let g:python3_host_prog = '/usr/local/bin/python3'
+
+
