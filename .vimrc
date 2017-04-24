@@ -9,6 +9,7 @@ Plugin 'VundleVim/Vundle.vim'
 " Go
 Plugin 'fatih/vim-go', {'for': 'go'}
 Plugin 'jodosha/vim-godebug'
+Plugin 'godoctor/godoctor.vim'
 
 " JavaScript
 Plugin 'pangloss/vim-javascript'
@@ -30,6 +31,7 @@ Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
 Plugin 'tpope/vim-surround'
 Plugin 'janko-m/vim-test'
+Plugin 'neomake/neomake'
 
 " Markdown
 Plugin 'godlygeek/tabular'
@@ -149,6 +151,14 @@ noremap <Down> <NOP>
 noremap <Left> <NOP>
 noremap <Right> <NOP>
 
+" neomake
+autocmd! BufWritePost * Neomake
+let g:neomake_open_list = 2
+nmap <Leader>b :Neomake!<CR>
+
+" vim-test
+let test#strategy = "neomake"
+
 " Instead of reverting the cursor to the last position in the buffer, we
 " set it to the first line when editing a git commit message
 au FileType gitcommit au! BufEnter COMMIT_EDITMSG call setpos('.', [0, 1, 1, 0])
@@ -178,7 +188,6 @@ autocmd Filetype go command! -bang AT call go#alternate#Switch(<bang>0, 'tabe')
 au FileType go nmap <Leader>r :GoRun<CR>
 au FileType go nmap <Leader>s <Plug>(go-def-split)
 au FileType go nmap <Leader>v <Plug>(go-def-vertical)
-au FileType go nmap <Leader>b <Plug>(go-build)
 au FileType go nmap <Leader>rr <Plug>(go-rename)
 
 " vim-airline
@@ -273,10 +282,14 @@ let g:unite_source_grep_default_opts =
       \  '''.hg'' --ignore ''.svn'' --ignore ''.git'' --ignore ''.bzr'' --ignore ''vendor'''
 let g:unite_source_grep_recursive_opt = ''
 
-" Nerd TREE
+" NERDTree
 noremap <Leader>n :NERDTreeToggle<cr>
 noremap <Leader>f :NERDTreeFind<cr>
 let NERDTreeShowHidden=1
+
+" Open if no file specified
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 
 " ultisnips
 function! g:UltiSnips_Complete()
@@ -319,5 +332,3 @@ let g:table_mode_corner="|"
 
 let g:python_host_prog = '/usr/local/bin/python'
 let g:python3_host_prog = '/usr/local/bin/python3'
-
-

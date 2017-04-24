@@ -38,7 +38,7 @@ alias reload='source ~/.zshrc'
 export PATH="/usr/local/heroku/bin:$PATH"
 
 # Golang
-export GOROOT="/usr/local/Cellar/go/1.8/libexec"
+export GOROOT="/usr/local/Cellar/go/1.8.1/libexec"
 export GOPATH="/Users/dlogvinenko/Developer/golang"
 export PATH="$GOPATH/bin:$PATH"
 
