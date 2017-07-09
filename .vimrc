@@ -8,8 +8,8 @@ Plugin 'VundleVim/Vundle.vim'
 
 " Go
 Plugin 'fatih/vim-go', {'for': 'go'}
-Plugin 'jodosha/vim-godebug'
 Plugin 'godoctor/godoctor.vim'
+Plugin 'sebdah/vim-delve'
 
 " JavaScript
 Plugin 'pangloss/vim-javascript'
@@ -27,11 +27,13 @@ Plugin 'rizzatti/dash.vim'
 Plugin 'Raimondi/delimitMate'
 Plugin 'tpope/vim-commentary'
 Plugin 'scrooloose/nerdtree'
-Plugin 'SirVer/ultisnips'
-Plugin 'honza/vim-snippets'
 Plugin 'tpope/vim-surround'
 Plugin 'janko-m/vim-test'
 Plugin 'neomake/neomake'
+Plugin 'tpope/vim-dispatch'
+
+" Mono
+Plugin 'OmniSharp/omnisharp-vim'
 
 " Markdown
 Plugin 'godlygeek/tabular'
@@ -50,7 +52,7 @@ Plugin 'zchee/deoplete-go', { 'do': 'make'}
 Plugin 'ervandew/supertab'
 
 " Shougo
-Plugin 'Shougo/unite.vim'
+Plugin 'Shougo/denite.nvim'
 Plugin 'Shougo/vimproc.vim', { 'do': 'make' }
 
 " File type
@@ -112,11 +114,14 @@ highlight ColorColumn ctermbg=234
 " Disable macroses
 map q <Nop>
 
-" 2 spaces to a tab, spaces as tab
-set expandtab
-set shiftwidth=2
-set softtabstop=2
-set smartindent
+set tabstop=4       " The width of a TAB is set to 4.
+                    " Still it is a \t. It is just that
+                    " Vim will interpret it to be having
+                    " a width of 4.
+
+set shiftwidth=4    " Indents will have a width of 4
+set softtabstop=4   " Sets the number of columns for a TAB
+set expandtab       " Expand TABs to spaces
 
 " Flexible window splits
 set winwidth=85
@@ -157,7 +162,8 @@ let g:neomake_open_list = 2
 nmap <Leader>b :Neomake!<CR>
 
 " vim-test
-let test#strategy = "neomake"
+" let test#strategy = "neomake"
+nmap <silent> <Leader>t :TestFile<CR>
 
 " Instead of reverting the cursor to the last position in the buffer, we
 " set it to the first line when editing a git commit message
@@ -165,6 +171,11 @@ au FileType gitcommit au! BufEnter COMMIT_EDITMSG call setpos('.', [0, 1, 1, 0])
 
 " Adjust tabs for .go files
 autocmd BufNewFile,BufRead *.go setlocal noet ts=4 sw=4 sts=4
+
+" Mono
+autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
+au FileType cs OmniSharpHighlightTypes
+autocmd BufWritePost *.cs call OmniSharp#AddToProject()
 
 " vim-go
 let g:go_term_enabled = 1
@@ -185,7 +196,6 @@ autocmd Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit'
 autocmd Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
 autocmd Filetype go command! -bang AT call go#alternate#Switch(<bang>0, 'tabe')
 
-au FileType go nmap <Leader>r :GoRun<CR>
 au FileType go nmap <Leader>s <Plug>(go-def-split)
 au FileType go nmap <Leader>v <Plug>(go-def-vertical)
 au FileType go nmap <Leader>rr <Plug>(go-rename)
@@ -263,6 +273,8 @@ let g:SuperTabDefaultCompletionType = "<c-n>"
 let g:deoplete#enable_at_startup = 1
 let g:deoplete#ignore_sources = {}
 let g:deoplete#ignore_sources._ = ['buffer', 'member', 'tag', 'file', 'neosnippet']
+let g:deoplete#sources = {}
+let g:deoplete#sources.cs = ['cs', 'omni', 'file', 'dictionary', 'buffer', 'ultisnips']
 let g:deoplete#sources#go#gocode_binary = $GOPATH.'/bin/gocode'
 let g:deoplete#sources#go#sort_class = ['package', 'func', 'type', 'var', 'const']
 let g:deoplete#sources#go#align_class = 1
@@ -272,15 +284,35 @@ call deoplete#custom#set('_', 'matchers', ['matcher_fuzzy'])
 call deoplete#custom#set('_', 'converters', ['converter_remove_paren'])
 call deoplete#custom#set('_', 'disabled_syntaxes', ['Comment', 'String'])
 
-" unite.vim
-nnoremap <C-p> :Unite buffer file_rec/neovim -start-insert<cr>
-nnoremap <leader>/ :Unite grep:.<cr>
+let g:deoplete#omni#input_patterns = {}
+let g:deoplete#omni#input_patterns.cs = ['\w*']
 
-let g:unite_source_grep_command = 'ag'
-let g:unite_source_grep_default_opts =
-      \ '-i --line-numbers --nocolor --nogroup --hidden --ignore ' .
-      \  '''.hg'' --ignore ''.svn'' --ignore ''.git'' --ignore ''.bzr'' --ignore ''vendor'''
-let g:unite_source_grep_recursive_opt = ''
+" denite.nvim
+nnoremap <C-p> :Denite buffer file_rec<cr>
+nnoremap <leader>/ :Denite grep:.<cr>
+
+" Change mappings.
+call denite#custom#map(
+      \ 'insert',
+      \ '<C-j>',
+      \ '<denite:move_to_next_line>',
+      \ 'noremap'
+      \)
+call denite#custom#map(
+      \ 'insert',
+      \ '<C-k>',
+      \ '<denite:move_to_previous_line>',
+      \ 'noremap'
+      \)
+
+" Ag command on grep source
+call denite#custom#var('grep', 'command', ['ag'])
+call denite#custom#var('grep', 'default_opts',
+		\ ['-i', '--vimgrep'])
+call denite#custom#var('grep', 'recursive_opts', [])
+call denite#custom#var('grep', 'pattern_opt', [])
+call denite#custom#var('grep', 'separator', ['--'])
+call denite#custom#var('grep', 'final_opts', [])
 
 " NERDTree
 noremap <Leader>n :NERDTreeToggle<cr>
@@ -290,43 +322,6 @@ let NERDTreeShowHidden=1
 " Open if no file specified
 autocmd StdinReadPre * let s:std_in=1
 autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
-
-" ultisnips
-function! g:UltiSnips_Complete()
-  call UltiSnips#ExpandSnippet()
-  if g:ulti_expand_res == 0
-    if pumvisible()
-      return "\<C-n>"
-    else
-      call UltiSnips#JumpForwards()
-      if g:ulti_jump_forwards_res == 0
-        return "\<TAB>"
-      endif
-    endif
-  endif
-  return ""
-endfunction
-
-function! g:UltiSnips_Reverse()
-  call UltiSnips#JumpBackwards()
-  if g:ulti_jump_backwards_res == 0
-    return "\<C-P>"
-  endif
-
-  return ""
-endfunction
-
-
-if !exists("g:UltiSnipsJumpForwardTrigger")
-  let g:UltiSnipsJumpForwardTrigger = "<tab>"
-endif
-
-if !exists("g:UltiSnipsJumpBackwardTrigger")
-  let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
-endif
-
-au InsertEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
-au InsertEnter * exec "inoremap <silent> " . g:UltiSnipsJumpBackwardTrigger . " <C-R>=g:UltiSnips_Reverse()<cr>"
 
 let g:table_mode_corner="|"
 
