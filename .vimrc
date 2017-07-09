@@ -49,11 +49,13 @@ Plugin 'endel/vim-github-colorscheme'
 " Autocomplete
 Plugin 'Shougo/deoplete.nvim'
 Plugin 'zchee/deoplete-go', { 'do': 'make'}
-Plugin 'ervandew/supertab'
 
 " Shougo
 Plugin 'Shougo/denite.nvim'
 Plugin 'Shougo/vimproc.vim', { 'do': 'make' }
+Plugin 'Shougo/neocomplete'
+Plugin 'Shougo/neosnippet'
+Plugin 'Shougo/neosnippet-snippets'
 
 " File type
 Plugin 'elzr/vim-json', {'for' : 'json'}
@@ -98,6 +100,7 @@ set ttyfast                     " Performance boost
 set pumheight=10                " Completion window max size
 set autowrite                   " Automatically write content on :make command
 set updatetime=100              " Update status line more often
+set conceallevel=0
 
 " Remember last position
 if has("autocmd")
@@ -181,15 +184,44 @@ autocmd BufWritePost *.cs call OmniSharp#AddToProject()
 let g:go_term_enabled = 1
 let g:go_fmt_command = "goimports"
 let g:go_auto_type_info = 1
+let g:go_auto_sameids = 1
+let g:go_addtags_transform = "snakecase"
 
 let g:go_highlight_operators = 1
 let g:go_highlight_functions = 1
 let g:go_highlight_methods = 1
 let g:go_highlight_structs = 1
+let g:go_highlight_types = 1
 let g:go_highlight_interfaces = 1
 let g:go_highlight_fields = 1
 let g:go_highlight_build_constraints = 1
 let g:go_highlight_extra_types = 1
+
+let g:go_snippet_engine = "neosnippet"
+
+let g:go_metalinter_deadline = "5s"
+let g:go_metalinter_enabled = [
+    \ 'vet',
+    \ 'vetshadow',
+    \ 'gotype',
+    \ 'deadcode',
+    \ 'gocyclo',
+    \ 'golint',
+    \ 'varcheck',
+    \ 'structcheck',
+    \ 'aligncheck',
+    \ 'errcheck',
+    \ 'megacheck',
+    \ 'dupl',
+    \ 'ineffassign',
+    \ 'interfacer',
+    \ 'unconvert',
+    \ 'goconst',
+    \ 'gas',
+    \ 'goimports',
+    \ 'misspell',
+    \ 'unparam'
+\]
 
 autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
 autocmd Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
@@ -199,6 +231,8 @@ autocmd Filetype go command! -bang AT call go#alternate#Switch(<bang>0, 'tabe')
 au FileType go nmap <Leader>s <Plug>(go-def-split)
 au FileType go nmap <Leader>v <Plug>(go-def-vertical)
 au FileType go nmap <Leader>rr <Plug>(go-rename)
+au FileType go nmap <Leader>l <Plug>(go-metalinter)
+au FileType go nmap <Leader>ga :GoAlternate<cr>
 
 " vim-airline
 let g:airline_powerline_fonts = 1
@@ -266,15 +300,12 @@ let g:vim_markdown_frontmatter = 1
 let g:vim_markdown_toml_frontmatter = 1
 let g:vim_markdown_json_frontmatter = 1
 
-" supertab
-let g:SuperTabDefaultCompletionType = "<c-n>"
-
 " deoplete.nvim
 let g:deoplete#enable_at_startup = 1
 let g:deoplete#ignore_sources = {}
 let g:deoplete#ignore_sources._ = ['buffer', 'member', 'tag', 'file', 'neosnippet']
 let g:deoplete#sources = {}
-let g:deoplete#sources.cs = ['cs', 'omni', 'file', 'dictionary', 'buffer', 'ultisnips']
+let g:deoplete#sources.cs = ['cs', 'omni', 'file', 'dictionary', 'buffer']
 let g:deoplete#sources#go#gocode_binary = $GOPATH.'/bin/gocode'
 let g:deoplete#sources#go#sort_class = ['package', 'func', 'type', 'var', 'const']
 let g:deoplete#sources#go#align_class = 1
@@ -286,6 +317,9 @@ call deoplete#custom#set('_', 'disabled_syntaxes', ['Comment', 'String'])
 
 let g:deoplete#omni#input_patterns = {}
 let g:deoplete#omni#input_patterns.cs = ['\w*']
+
+" deoplete tab-complete
+inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
 
 " denite.nvim
 nnoremap <C-p> :Denite buffer file_rec<cr>
@@ -305,14 +339,21 @@ call denite#custom#map(
       \ 'noremap'
       \)
 
+" Change sorters.
+call denite#custom#source('file_rec', 'sorters', ['sorter_sublime'])
+
 " Ag command on grep source
 call denite#custom#var('grep', 'command', ['ag'])
-call denite#custom#var('grep', 'default_opts',
-		\ ['-i', '--vimgrep'])
+call denite#custom#var('grep', 'default_opts', ['-i', '--vimgrep'])
 call denite#custom#var('grep', 'recursive_opts', [])
 call denite#custom#var('grep', 'pattern_opt', [])
 call denite#custom#var('grep', 'separator', ['--'])
 call denite#custom#var('grep', 'final_opts', [])
+
+" neosnippet
+imap <C-k>     <Plug>(neosnippet_expand_or_jump)
+smap <C-k>     <Plug>(neosnippet_expand_or_jump)
+xmap <C-k>     <Plug>(neosnippet_expand_target)
 
 " NERDTree
 noremap <Leader>n :NERDTreeToggle<cr>
